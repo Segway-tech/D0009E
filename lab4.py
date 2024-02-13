@@ -1,60 +1,155 @@
 #In A Galaxy Far Far Away
-#Function to create the dictionary to store information 
-def dictionary():
-    dic = {}
-    return dic
 
-#Creating a Alias for dictionary
-dicContact = dictionary()
+#Create class 
+class Phone:
+    def __init__(self):
+        #List of commands
+        self.command = {"add": self.addContact, 
+                   "lookup": self.findContact, 
+                   "alias": self.addAlias, 
+                   "change": self.changeNum, 
+                   "save": self.save, 
+                   "load": self.load, 
+                   "delete": self.deleteContact, 
+                   "quit": self.quit, 
+                   "options": self.option}
+        self.phone = {}
 
-#Fucntion to create the main meny
-def mainMeny():
-    while True: 
-        print("Meny för telefonboken!")
-        print("Val 1: Lägg till kontakt")
-        print("Val 2: Visa kontakt")
-        print("Val 3: Ändra kontakt")
-        print("Val 4: Avsluta programmet")
-        choice  = input("Välj alternativ: ")
-        if choice == "1":
-            addContact()
-        elif choice == "2":
-            findContact()
-        elif choice == "3":
-            changeContact()
-        elif choice == "4":
-            print("Hej Då!")
-            break
-        else: 
-            print("Error!")
+        
 
-#Function that adds new contact to the phonebook
-def addContact():
-    print()
-    name = input("Skriv in namn: ")
-    phoneN = input("Skriv telefonnummer: ")
-    while name not in dicContact:
-        dicContact[name] = name, phoneN
-        print()
-        break
-    else:
-        print()
-        print(name, " finns redan i telefonlistan!")
-        print()
-    
-def findContact():
-    print()
-    name = input("Skriv in namnet på personen du söker: ")
-    if name in dicContact:
-        print(dicContact[name])
-    else: 
-        print("Kontakten finns inte i telefonboken")
-        print()
+#Function to run the program and start the user input
+    def run(self):
+        print("Type 'options' for a list of commands")
+        while True:
+            #input for phonebook
+            teleb = input("PhoneBook>").casefold()
+            if teleb in self.command:
+                match teleb: 
+                    case "add":
+                        self.addContact()
+                    case "lookup":
+                        self.findContact()
+                    case "alias":
+                        self.addAlias()
+                    case "change":
+                        self.changeNum()
+                    case "save":
+                        self.save()
+                    case "load":
+                        self.load()
+                    case "delete":
+                        self.deleteContact()
+                    case "quit":
+                        self.quit()
+                    case "options":
+                        self.option()
+                    case _:
+                        print("Kommando existerar inte!")
+                
+            
+#Function to add contact in the phone book
+    def addContact(self):
+        name = input("Name: ")
+        phoneN = input("Phone: ")
+        if name in self.phone.keys():
+            print(name, "finns redan i telefonboken!")
+        elif phoneN in self.phone.values():
+            print(phoneN, "finns redan i telefonboken!")
+        else:
+            self.phone[name] = phoneN
+            print("Kontakten har lagts till!")
+    #klar
 
-def changeContact():
-    name = input("Vilken kontakt vill du ändra: ")
-    newName = input("Ändra namn på kontakten: ")
-    dicContact[newName] = dicContact.pop(name)
-    print(dicContact[newName])
+#Function to add alias 
+    def addAlias(self):
+        name = input("Name: ")
+        newName =  input("Alias: ")
+        if newName not in self.phone.keys():
+            if name in self.phone.keys():
+                self.phone[newName] = self.phone[name]
+                print("Alias har lagts till för", name, "som", newName)
+            else: 
+                print("Namnet finns inte")
+#klar
 
-mainMeny()
+#Function to search for contact, both name and alias 
+    def findContact(self):
+        name = input("Namn: ")
+        if name in self.phone.keys():
+            print(name + ":", self.phone[name])            
+        else:
+            print(name, "finns inte i telefonboken!")
+#klar
+#Function to change number
+    def changeNum(self):
+        name = input("Namn: ")
+        newNum = input("Nytt nummer: ")
+        if name in self.phone.keys():
+            oldNumb = self.phone[name]
+            if newNum not in self.phone.values():
+                self.phone[name] = newNum
+                print("Nummret för ", name, "är uppdaterad från" , oldNumb, "till", newNum)
+            else: 
+                print("Ny nummer finns redan i telefonboken!")
+        else:
+            print(name, " finns inte i telefonboken")
+#klar
+#Function to delete a contact
+    def deleteContact(self, b):
+        name = b.split()[1]
+        for n in self.phone.keys():
+            if name in self.phone.keys():
+                del self.phone[name]
+                print("Kontakten har tagits bort")
+                break
+            elif name in n:
+                del self.phone[n]
+                print("Kontakten har tagit bort")
+                break
+            else:
+                print(name, "finns inte!")
+
+#Function to save the phonebook
+    def save(self, b):
+        filename = b.split()[1]
+        with open(filename, "2") as f:
+            for phoneN,names in self.phone.items():
+                if isinstance(phoneN, str) is True:
+                    rad = names
+                    f.write(rad)
+                    print("Filen är sparad!")
+                elif isinstance(phoneN, tuple) is True:
+                    for n in phoneN: 
+                        rad = names
+                        f.write(rad)
+                        print("Filen är sparad!")
+
+#Function to load up the saved phonebook
+    def load(self, b):
+        filename = b.split()[1]
+        with open(filename, "r") as f:
+            for rad in f:
+                n = rad.split(";")
+                name = n[1]
+                phoneN = n[0]
+                self.phone[name] = phoneN
+
+    def option(self):
+        print("OPTIONS", "\n", "add: Add contact", "\n", 
+        "lookup: Look up a contact", 
+        "\n", "alias: Adds an alias", "\n", 
+        "change: Changes number to contact",
+        "\n", "save: Save contactfile", "\n", 
+        "load: Load contactfile", "\n", "delete: Deletes contacts",
+         "\n", "Quit: Exits Program")
+
+#Function to quit the program
+    def quit(self):
+        print("Hej Då!")
+        raise SystemExit
+
+
+#create a instance of the class
+if __name__ == "__main__":
+    phone = Phone()
+    phone.run()
