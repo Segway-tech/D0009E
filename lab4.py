@@ -96,43 +96,32 @@ class Phone:
 #klar
 #Function to delete a contact
     def deleteContact(self, b):
-        name = b.split()[1]
-        for n in self.phone.keys():
-            if name in self.phone.keys():
-                del self.phone[name]
-                print("Kontakten har tagits bort")
-                break
-            elif name in n:
-                del self.phone[n]
-                print("Kontakten har tagit bort")
-                break
-            else:
-                print(name, "finns inte!")
-
+        name = input("Namn: ")
+        if name in self.phone.keys():
+            del self.phone[name]
+            print("Kontakten har tagits bort")
+        else:
+            print(name, "finns inte!")
+#klar
 #Function to save the phonebook
-    def save(self, b):
-        filename = b.split()[1]
-        with open(filename, "2") as f:
-            for phoneN,names in self.phone.items():
-                if isinstance(phoneN, str) is True:
-                    rad = names
-                    f.write(rad)
-                    print("Filen är sparad!")
-                elif isinstance(phoneN, tuple) is True:
-                    for n in phoneN: 
-                        rad = names
-                        f.write(rad)
-                        print("Filen är sparad!")
+    def save(self):
+        filename = input("Ange namnet på filen: ")
+        try:
+            with open(filename, "w") as f:
+                for name, phoneN in self.phone.items():
+                    f.write(phoneN + ";" + name + "\n")
+            print("Telefonboken har sparats!")
+        except IOError:
+            print("Kunde inte spara telefonboken!")
 
 #Function to load up the saved phonebook
-    def load(self, b):
-        filename = b.split()[1]
+    def load(self):
+        filename = input("Ange namnet på filen (.txt): ")
         with open(filename, "r") as f:
             for rad in f:
-                n = rad.split(";")
-                name = n[1]
-                phoneN = n[0]
+                name , phoneN = rad.strip().split(";") 
                 self.phone[name] = phoneN
+        print("Telefonboken har laddats!", filename, ":", self.phone)
 
     def option(self):
         print("OPTIONS", "\n", "add: Add contact", "\n", 
